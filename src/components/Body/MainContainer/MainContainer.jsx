@@ -1,10 +1,14 @@
 import { useEffect, useState } from 'react';
 import { api_url } from '../../../utils/constants';
 import VideoCard from '../../common/VideoCard';
-import { FiLoader } from 'react-icons/fi';
 
 const MainContainer = () => {
-  const [videos, setVideos] = useState([]);
+  const [videos, setVideos] = useState(
+    Array.from({ length: 20 }, (_, index) => ({
+      id: `shimmer-${index}`,
+      isLoading: true
+    }))
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -28,14 +32,6 @@ const MainContainer = () => {
 
     fetchVideos();
   }, []);
-
-  if (isLoading) {
-    return (
-      <div className="flex-1 flex items-center justify-center">
-        <FiLoader className="w-12 h-12 animate-spin text-youtube-red" />
-      </div>
-    );
-  }
 
   if (error) {
     return (
@@ -77,7 +73,7 @@ const MainContainer = () => {
       {/* Videos Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {videos.map((video) => (
-          <VideoCard key={video.id} videoData={video} />
+          <VideoCard key={video.id} videoData={video} isLoading={isLoading} />
         ))}
       </div>
     </div>

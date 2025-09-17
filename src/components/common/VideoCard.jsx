@@ -2,8 +2,13 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { FiMoreVertical, FiClock } from 'react-icons/fi';
 import { formatDistanceToNow } from 'date-fns';
+import { VideoCardShimmer } from './Shimmer';
 
-const VideoCard = ({ videoData }) => {
+const VideoCard = ({ videoData, isLoading = false }) => {
+  if (isLoading) {
+    return <VideoCardShimmer />;
+  }
+  
   const { snippet, statistics, contentDetails } = videoData;
   const { title, channelTitle, thumbnails, publishedAt } = snippet;
   const { viewCount } = statistics;

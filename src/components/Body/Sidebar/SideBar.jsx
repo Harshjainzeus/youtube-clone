@@ -36,11 +36,15 @@ const SideBar = () => {
     { icon: <FiList className="w-6 h-6" />, name: 'Playlists' },
   ];
 
-  if (!isMenuOpen) return null;
+  // if (!isMenuOpen) return null;
 
   return (
-    <div className={`hidden md:block h-full overflow-y-auto dark:bg-gray-900 text-white w-64 flex-shrink-0 transform transition-all duration-300 ease-in-out translate-x-0 `}>
-    <div className="w-64 h-full overflow-y-auto text-sm">
+    // <div className={`hidden md:block h-full overflow-y-auto dark:bg-gray-900 text-white w-64 flex-shrink-0 transform transition-all duration-300 ease-in-out translate-x-0 `}>
+<div
+  className={`h-screen bg-gray-900 text-white transition-all duration-300 ease-in-out
+    ${isMenuOpen ? "w-64" : "w-18"}`}
+>
+    <div className=" h-full overflow-y-auto text-sm">
       <div className="p-4">
         {mainLinks.map(({ icon, name, path }) => (
           <Link
@@ -51,7 +55,7 @@ const SideBar = () => {
             }`}
           >
             <span className="mr-4">{icon}</span>
-            <span>{name}</span>
+            {isMenuOpen && <span>{name}</span>}
           </Link>
         ))}
       </div>
@@ -66,7 +70,7 @@ const SideBar = () => {
             className="flex items-center w-full p-2 rounded-lg hover:dark:bg-gray-500 text-left"
           >
             <span className="mr-4">{icon}</span>
-            <span>{name}</span>
+            {isMenuOpen && <span>{name}</span>}
           </button>
         ))}
       </div>
@@ -74,21 +78,21 @@ const SideBar = () => {
       <div className="border-t border-gray-700 my-2"></div>
 
       <div className="p-4">
-        <h3 className="px-2 mb-2 text-lg font-medium">Subscriptions</h3>
+        <h3 className="px-2 mb-2 text-lg font-medium">{isMenuOpen? 'Subscriptions':'Sub'}</h3>
         {subscriptionLinks.map(({ icon, name }) => (
           <button
             key={name}
             className="flex items-center w-full p-2 rounded-lg hover:dark:bg-gray-500 text-left"
           >
             <span className="mr-4">{icon}</span>
-            <span>{name}</span>
+            {isMenuOpen && <span>{name}</span>}
           </button>
         ))}
         <button className="flex items-center w-full p-2 rounded-lg hover:dark:bg-gray-500 text-left">
           <span className="mr-4">
             <FiChevronDown className="w-6 h-6" />
           </span>
-          <span>Show more</span>
+          {isMenuOpen && <span>Show more</span>}
         </button>
       </div>
     </div>

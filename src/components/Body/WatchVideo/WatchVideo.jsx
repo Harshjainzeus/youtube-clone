@@ -17,6 +17,16 @@ import { BsThreeDots, BsEmojiSmile, BsGift, BsCollection } from 'react-icons/bs'
 import { BiDislike, BiLike } from 'react-icons/bi';
 import { RiLiveLine } from 'react-icons/ri';
 
+const videoData = {
+  title: "This is a sample video title that might be very long and need to be truncated",
+  channel: "Channel Name",
+  subscribers: "1.2M",
+  views: "1,234,567 views",
+  uploadDate: "2 days ago",
+  likes: "123K",
+  description: "This is a detailed description of the video. It might contain multiple lines of text that explain what the video is about, who it's for, and other relevant information. The description can be quite long, so we'll implement a show more/less functionality to handle longer text."
+};
+
 const WatchVideo = () => {
   const dispatch = useDispatch();
   const [searchParams] = useSearchParams();
@@ -24,7 +34,12 @@ const WatchVideo = () => {
   const [showMoreDescription, setShowMoreDescription] = useState(false);
   const [liked, setLiked] = useState(false);
   const [disliked, setDisliked] = useState(false);
-  const [subscribed, setSubscribed] = useState(false);
+  const [subscribed, setSubscribed] = useState(() => {
+    // Check local storage for subscription status
+    const savedSubs = JSON.parse(localStorage.getItem('youtube-subscriptions') || '{}');
+    return savedSubs[videoData?.channelId] || false;
+  });
+  const [showSubscribeDialog, setShowSubscribeDialog] = useState(false);
   const [saved, setSaved] = useState(false);
   
   const videoId = searchParams.get("v");
@@ -61,7 +76,28 @@ const WatchVideo = () => {
   };
 
   const toggleSubscribe = () => {
-    setSubscribed(!subscribed);
+    if (!subscribed) {
+      setShowSubscribeDialog(true);
+    } else {
+      updateSubscription(false);
+    }
+  };
+
+  const confirmSubscribe = () => {
+    updateSubscription(true);
+    setShowSubscribeDialog(false);
+  };
+
+  const updateSubscription = (isSubscribed) => {
+    setSubscribed(isSubscribed);
+    // Save to local storage
+    const savedSubs = JSON.parse(localStorage.getItem('youtube-subscriptions') || '{}');
+    if (isSubscribed) {
+      savedSubs[videoData.channelId] = true;
+    } else {
+      delete savedSubs[videoData.channelId];
+    }
+    localStorage.setItem('youtube-subscriptions', JSON.stringify(savedSubs));
   };
 
   const toggleSave = () => {
@@ -69,15 +105,7 @@ const WatchVideo = () => {
   };
 
   // Mock video data - replace with actual data
-  const videoData = {
-    title: "This is a sample video title that might be very long and need to be truncated",
-    channel: "Channel Name",
-    subscribers: "1.2M",
-    views: "1,234,567 views",
-    uploadDate: "2 days ago",
-    likes: "123K",
-    description: "This is a detailed description of the video. It might contain multiple lines of text that explain what the video is about, who it's for, and other relevant information. The description can be quite long, so we'll implement a show more/less functionality to handle longer text."
-  };
+  
 
   return (
     <div className="flex flex-col lg:flex-row dark:bg-gray-900 text-white p-4">
@@ -168,12 +196,57 @@ const WatchVideo = () => {
                 <div className="text-sm text-gray-400">{videoData.subscribers} subscribers</div>
               </div>
             </div>
-            <button 
-              onClick={toggleSubscribe}
-              className={`px-4 py-2 rounded-full font-medium ${subscribed ? 'bg-gray-600 text-white' : 'bg-red-600 text-white hover:bg-red-700'}`}
-            >
-              {subscribed ? 'Subscribed' : 'Subscribe'}
-            </button>
+            <div className="relative">
+              <button 
+                onClick={toggleSubscribe}
+                className={`px-4 py-2 rounded-full font-medium flex items-center ${subscribed ? 'bg-gray-200 text-gray-800 hover:bg-gray-300' : 'bg-red-600 text-white hover:bg-red-700'}`}
+              >
+                {subscribed ? (
+                  <>
+                    <span>Subscribed</span>
+                    <FiChevronDown className="ml-1" />
+                  </>
+                ) : 'Subscribe'}
+              </button>
+              
+              {/* Subscription dropdown menu */}
+              {subscribed && (
+                <div className="absolute right-0 mt-1 w-48 bg-white dark:bg-gray-800 rounded-md shadow-lg py-1 z-10">
+                  <button 
+                    onClick={() => updateSubscription(false)}
+                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700"
+                  >
+                    Unsubscribe
+                  </button>
+                </div>
+              )}
+              
+              {/* Subscription confirmation dialog */}
+              {showSubscribeDialog && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                  <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-96">
+                    <h3 className="text-lg font-medium mb-4">Subscribe to {videoData.channel}?</h3>
+                    <p className="text-gray-600 dark:text-gray-300 mb-6">
+                      Subscribe to see all their videos and updates.
+                    </p>
+                    <div className="flex justify-end space-x-3">
+                      <button 
+                        onClick={() => setShowSubscribeDialog(false)}
+                        className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md"
+                      >
+                        Cancel
+                      </button>
+                      <button 
+                        onClick={confirmSubscribe}
+                        className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-md"
+                      >
+                        Subscribe
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
           
           {/* Video Description */}
