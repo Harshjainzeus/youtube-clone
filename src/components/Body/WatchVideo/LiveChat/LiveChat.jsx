@@ -24,7 +24,7 @@ const LiveChat = () => {
   const chat = useSelector((state)=> state.chat);
 
   return (
-    <div className='h-[500px] bg-gray-200 p-2 ml-2 overflow-y-scroll flex flex-col-reverse'>
+    <div className='h-[500px] bg-gray-800 p-2  overflow-y-scroll flex flex-col-reverse'>
         {chat.map((item,index)=>(
             <Chat key={index} name={item.name} message={item.message}/>
         ))}
